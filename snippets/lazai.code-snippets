@@ -1,0 +1,31 @@
+{
+  "Create LazAI Comedian Agent": {
+    "prefix": "lazai-agent",
+    "body": [
+      "import { Agent } from 'alith';",
+      "",
+      "const agent = new Agent({",
+      "    model: '$1',",
+      "    preamble: '$2'",
+      "});",
+      "",
+      "console.log(await agent.prompt('$3'));"
+    ],
+    "description": "Create a LazAI agent with model, preamble, and prompt"
+  },
+  
+
+
+"Add LazAI Tool": {
+  "prefix": "lazai-addtool",
+  "body": [
+    "agent.addTool({",
+    "    name: '$1',",
+    "    execute: async () => {",
+    "        $2",
+    "    }",
+    "});"
+  ],
+  "description": "Add a tool to an existing LazAI agent"
+}
+}

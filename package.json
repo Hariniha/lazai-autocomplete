@@ -1,0 +1,56 @@
+{
+  "name": "lazai-autocomplete",
+  "displayName": "LazAI Autocomplete",
+  "description": "Autocomplete, hover tooltips & snippets for LazAI SDK",
+  "version": "0.0.1",
+  "publisher": "harini",
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": ["onLanguage:javascript"],
+  "main": "./extension.js",
+ "contributes": {
+    "commands": [
+        {
+            "command": "lazai-autocomplete.createAgent",
+            "title": "LazAI: Create New Agent"
+        },
+        {
+            "command": "lazai-autocomplete.createTool",
+            "title": "LazAI: Create New Tool"
+        },
+            {
+        "command": "lazai-autocomplete.showDocs",
+        "title": "LazAI: Show SDK Documentation"
+    }
+
+    ],
+    "languages": [
+        {
+            "id": "javascript",
+            "extensions": [".js"],
+            "aliases": ["JavaScript"]
+        }
+    ],
+    "snippets": [
+        {
+            "language": "javascript",
+            "path": "./snippets/lazai.code-snippets"
+        }
+    ]
+},
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.104.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "eslint": "^9.34.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
