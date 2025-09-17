@@ -7,50 +7,61 @@
   "engines": {
     "vscode": "^1.104.0"
   },
-  "categories": ["Other"],
-  "activationEvents": ["onLanguage:javascript"],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript"
+  ],
   "main": "./extension.js",
- "contributes": {
+  "contributes": {
     "commands": [
-        {
-            "command": "lazai-autocomplete.createAgent",
-            "title": "LazAI: Create New Agent"
-        },
-        {
-            "command": "lazai-autocomplete.createTool",
-            "title": "LazAI: Create New Tool"
-        },
-            {
+      {
+        "command": "lazai-autocomplete.createAgent",
+        "title": "LazAI: Create New Agent"
+      },
+      {
+        "command": "lazai-autocomplete.createTool",
+        "title": "LazAI: Create New Tool"
+      },
+      {
         "command": "lazai-autocomplete.showDocs",
         "title": "LazAI: Show SDK Documentation"
-    }
-
+      }
     ],
     "languages": [
-        {
-            "id": "javascript",
-            "extensions": [".js"],
-            "aliases": ["JavaScript"]
-        }
+      {
+        "id": "javascript",
+        "extensions": [
+          ".js"
+        ],
+        "aliases": [
+          "JavaScript"
+        ]
+      }
     ],
     "snippets": [
-        {
-            "language": "javascript",
-            "path": "./snippets/lazai.code-snippets"
-        }
+      {
+        "language": "javascript",
+        "path": "./snippets/lazai.code-snippets"
+      }
     ]
-},
+  },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.104.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "eslint": "^9.34.0",
+    "@types/vscode": "^1.104.0",
     "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.34.0"
+  },
+  "dependencies": {
+    "alith": "^0.12.3",
+    "dotenv": "^17.2.2"
   }
 }

@@ -1,10 +1,12 @@
 const vscode = require('vscode');
+const { Agent } = require('alith');
+require('dotenv').config();
 
 function activate(context) {
-    console.log('LazAI Autocomplete is now active!');
+    console.log('✅ LazAI Autocomplete is now active!');
 
     // --------------------------
-    // 1️⃣ Completion Provider (same as before)
+    // 1️⃣ Completion Provider
     // --------------------------
     const completionProvider = vscode.languages.registerCompletionItemProvider(
         'javascript',
@@ -16,7 +18,7 @@ function activate(context) {
                 completions.push(new vscode.CompletionItem('Agent', vscode.CompletionItemKind.Class));
                 completions.push(new vscode.CompletionItem('Tool', vscode.CompletionItemKind.Class));
 
-                // LazAI Methods with parameter hints
+                // LazAI Methods
                 const addToolCompletion = new vscode.CompletionItem('addTool', vscode.CompletionItemKind.Method);
                 addToolCompletion.insertText = new vscode.SnippetString(
                     'addTool({ name: "$1", execute: ($2) => {\n\t$3\n}})'
@@ -36,11 +38,11 @@ function activate(context) {
                 return completions;
             }
         },
-        '.'
+        '.' // trigger on dot
     );
 
     // --------------------------
-    // 2️⃣ Hover Provider with links
+    // 2️⃣ Hover Provider
     // --------------------------
     const hoverProvider = vscode.languages.registerHoverProvider('javascript', {
         provideHover(document, position) {
@@ -48,38 +50,74 @@ function activate(context) {
             const word = document.getText(range);
 
             const docs = {
-                'Agent': '**Agent**: Main class to create a LazAI agent.\n\nExample:\n`const agent = new Agent({ model: "gpt-4" })`\n[Learn more](https://lazai-docs.example.com/agent)',
-                'Tool': '**Tool**: Defines a skill or function for the agent.\n\nExample:\n`agent.addTool({ name: "jokes", execute: () => "funny" })`\n[Learn more](https://lazai-docs.example.com/tool)',
-                'run': '**run()**: Executes the agent with all its tools.\n\nExample:\n`agent.run()`\n[Learn more](https://lazai-docs.example.com/run)',
-                'addTool': '**addTool()**: Adds a new tool to the agent.\n\nExample:\n`agent.addTool({ name: "calculator", execute: () => {} })`\n[Learn more](https://lazai-docs.example.com/addTool)',
-                'setName': '**setName()**: Sets a custom name for the agent.\n\nExample:\n`agent.setName("ComedianBot")`\n[Learn more](https://lazai-docs.example.com/setName)',
-                'getTools': '**getTools()**: Returns a list of tools added to the agent.\n\nExample:\n`agent.getTools()`\n[Learn more](https://lazai-docs.example.com/getTools)'
+                'Agent': '**Agent**: Main class to create a LazAI agent.\n\nExample:\n```js\nconst agent = new Agent({ model: "gpt-4" })\n```\n[Learn more](https://lazai-docs.example.com/agent)',
+                'Tool': '**Tool**: Defines a skill or function for the agent.\n\nExample:\n```js\nagent.addTool({ name: "jokes", execute: () => "funny" })\n```\n[Learn more](https://lazai-docs.example.com/tool)',
+                'run': '**run()**: Executes the agent with all its tools.\n\nExample:\n```js\nagent.run()\n```\n[Learn more](https://lazai-docs.example.com/run)',
+                'addTool': '**addTool()**: Adds a new tool to the agent.\n\nExample:\n```js\nagent.addTool({ name: "calculator", execute: () => {} })\n```\n[Learn more](https://lazai-docs.example.com/addTool)',
+                'setName': '**setName()**: Sets a custom name for the agent.\n\nExample:\n```js\nagent.setName("ComedianBot")\n```\n[Learn more](https://lazai-docs.example.com/setName)',
+                'getTools': '**getTools()**: Returns a list of tools added to the agent.\n\nExample:\n```js\nagent.getTools()\n```\n[Learn more](https://lazai-docs.example.com/getTools)'
             };
 
             if (docs[word]) {
-                return new vscode.Hover(docs[word]);
+                return new vscode.Hover(new vscode.MarkdownString(docs[word]));
             }
         }
     });
 
     // --------------------------
-    // 3️⃣ Command: Open LazAI Documentation Panel
+    // 3️⃣ Docs Panel Command
     // --------------------------
     const docPanelCommand = vscode.commands.registerCommand('lazai-autocomplete.showDocs', () => {
         const panel = vscode.window.createWebviewPanel(
-            'lazaiDocs', // internal identifier
-            'LazAI SDK Docs', // title
-            vscode.ViewColumn.Two, // open in second column
+            'lazaiDocs',
+            'LazAI SDK Docs',
+            vscode.ViewColumn.Two,
             { enableScripts: true }
         );
-
         panel.webview.html = getWebviewContent();
     });
 
     // --------------------------
-    // 4️⃣ Reuse previous commands
+    // 4️⃣ AI Suggestion Command
     // --------------------------
-    context.subscriptions.push(completionProvider, hoverProvider, docPanelCommand);
+    const aiSuggestCommand = vscode.commands.registerCommand('lazai-autocomplete.suggestAI', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        const doc = editor.document;
+        const pos = editor.selection.active;
+        const textBefore = doc.getText(new vscode.Range(new vscode.Position(0, 0), pos));
+
+        const agent = new Agent({
+            model: "gpt-4", // adjust to your available model
+            apiKey: process.env.GROQ_API_KEY
+        });
+
+        vscode.window.showInformationMessage('🤖 LazAI is generating suggestions...');
+
+        try {
+            // Using .prompt() for AI completions
+            const suggestion = await agent.prompt(`Suggest the next few lines of code:\n\n${textBefore}`);
+
+            if (suggestion && typeof suggestion === 'string') {
+                editor.insertSnippet(new vscode.SnippetString(suggestion), pos);
+            } else {
+                vscode.window.showWarningMessage('No AI suggestion available.');
+            }
+        } catch (err) {
+            vscode.window.showErrorMessage('AI suggestion failed: ' + err.message);
+        }
+    });
+
+    // --------------------------
+    // Register Everything
+    // --------------------------
+    context.subscriptions.push(
+        completionProvider,
+        hoverProvider,
+        docPanelCommand,
+        aiSuggestCommand
+    );
 }
 
 function deactivate() {}
@@ -87,7 +125,7 @@ function deactivate() {}
 module.exports = { activate, deactivate };
 
 // --------------------------
-// HTML content for Webview
+// HTML content for Docs Panel
 // --------------------------
 function getWebviewContent() {
     return `
