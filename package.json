@@ -3,6 +3,7 @@
   "displayName": "LazAI Autocomplete",
   "description": "Autocomplete, hover tooltips & snippets for LazAI SDK",
   "version": "0.0.1",
+  "type": "module",
   "publisher": "harini",
   "engines": {
     "vscode": "^1.104.0"
